@@ -1,29 +1,35 @@
 ﻿using ApiJerarquia.Models.DTOs;
 using ApiJerarquia.Models.Entities;
+using Microsoft.EntityFrameworkCore;
+using System.Xml;
 
 namespace ApiJerarquia.Repositories
 {
     public class DepartamentosRepository:Repository<Departamentos>
     {
-        private readonly ItesrcneActividadesContext context;
+        private readonly ItesrcneActividadesContext _context;
         public DepartamentosRepository(ItesrcneActividadesContext Context) : base(Context)
         {
-            context=Context;
+            _context=Context;
         }
-        public Departamentos?Get(string email)
+
+        
+        public override IEnumerable<Departamentos> GetAll()
         {
-            return context.Departamentos.Where(x => x.Username == email).FirstOrDefault();
+            return _context.Departamentos
+                .Include(x => x.InverseIdSuperiorNavigation)
+                .OrderBy(x => x.Nombre);
         }
-        public IEnumerable<DepartamentoDTO>GetDepartamentos()
+        public override Departamentos? Get(object id)
         {
-            return context.Departamentos.OrderBy
-                (x => x.Nombre)
-                .Select(d => new DepartamentoDTO
-                {
-                    Id=d.Id,
-                    
-                });
-                
+           if(id==null || !int.TryParse(id.ToString(),
+               out int departamentoId))
+            {
+                return null;
+            }
+           return _context.Departamentos
+                .Include(x=>x.IdSuperiorNavigation)
+                .FirstOrDefault(x=>x.Id==departamentoId);
         }
 
     }

@@ -8,7 +8,8 @@ namespace ApiJerarquia.Mappers
     {
         public AutoMapping() 
         {
-            CreateMap<Actividades, ActividadDTO>();
+            CreateMap<Actividades, ActividadDTO>()
+                .ForMember(destinationMember=>destinationMember.Titulo);
             CreateMap<ActividadDTO, Actividades>();
             CreateMap<Departamentos,DepartamentoDTO>();
             CreateMap<DepartamentoDTO, Departamentos>();
