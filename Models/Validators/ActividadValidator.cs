@@ -6,7 +6,7 @@ namespace ApiJerarquia.Models.Validators
 {
     public class ActividadValidator
     {
-        public static ValidationResult Validate(ActividadCreateDTO Actividad)
+        public static FluentValidation.Results.ValidationResult Validate(ActividadCreateDTO Actividad)
         {
             var validator = new InlineValidator<ActividadCreateDTO>();
             validator.RuleFor(x => x.Titulo)

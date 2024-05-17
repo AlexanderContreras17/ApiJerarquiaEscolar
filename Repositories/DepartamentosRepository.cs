@@ -13,13 +13,6 @@ namespace ApiJerarquia.Repositories
             _context=Context;
         }
 
-        
-        public override IEnumerable<Departamentos> GetAll()
-        {
-            return _context.Departamentos
-                .Include(x => x.InverseIdSuperiorNavigation)
-                .OrderBy(x => x.Nombre);
-        }
         public override Departamentos? Get(object id)
         {
            if(id==null || !int.TryParse(id.ToString(),
@@ -30,6 +23,13 @@ namespace ApiJerarquia.Repositories
            return _context.Departamentos
                 .Include(x=>x.IdSuperiorNavigation)
                 .FirstOrDefault(x=>x.Id==departamentoId);
+        }
+        
+        public override IEnumerable<Departamentos> GetAll()
+        {
+            return _context.Departamentos
+                .Include(x => x.InverseIdSuperiorNavigation)
+                .OrderBy(x => x.Nombre);
         }
 
     }
