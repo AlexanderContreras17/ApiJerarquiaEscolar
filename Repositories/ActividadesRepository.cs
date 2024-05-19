@@ -42,5 +42,11 @@ namespace ApiJerarquia.Repositories
                 .FirstOrDefault(x => x.Id == actividadId);
                     
         }
+        public IEnumerable<Actividades>? GetActividadesporDepartamento(int id)
+        {
+            return _context.Actividades
+                .Include(x => x.IdDepartamentoNavigation)
+                .Where(x => x.IdDepartamento == id);
+        }
     }
 }

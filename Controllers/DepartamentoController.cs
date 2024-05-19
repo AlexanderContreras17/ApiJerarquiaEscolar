@@ -50,5 +50,92 @@ namespace ApiJerarquia.Controllers
                 return NotFound();
             }
         }
+        [HttpPost]
+        public IActionResult Agregar(DepartamentoCreateDTO dto)
+        {
+            if(dto != null)
+            {
+            ValidationResult validate = DepartamentoValidator.Validate(dto, _repository.Context);
+               if(validate.IsValid)
+                {
+                    var departamento = new Departamentos
+                    {
+                        Nombre = dto.Nombre,
+                        Password = Encriptacion.StringToSHA512(dto.Contraseña),
+                        Username = dto.Usuario,
+                        IdSuperior = dto.IdSuperior
+                    };
+                    _repository.Insert(departamento);
+                    return Ok(departamento);
+                }
+                else
+                {
+                    return BadRequest(validate.Errors.Select(x=>x.ErrorMessage));
+                }
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+        [HttpPut("{id}")]
+        public IActionResult Editar(DepartamentoCreateDTO dto)
+        {
+                ValidationResult validate = DepartamentoValidator.Validate(dto, _repository.Context);
+
+            if (validate.IsValid)
+            {
+                var departamento = _repository.Get(dto.Id ?? 0);
+
+                if (departamento != null)
+
+                {
+                    departamento.Nombre = dto.Nombre;
+                    departamento.Password = Encriptacion
+                        .StringToSHA512(dto.Contraseña);
+                    departamento.IdSuperior = dto.IdSuperior;
+
+
+                    _repository.Insert(departamento);
+                    return Ok(departamento);
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+            }
+            else
+            {
+                return BadRequest(validate.Errors.Select(x => x.ErrorMessage));
+            }
+           
+        }
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var departamento=_repository.Get(id);
+            var actividadDepartamento =
+                _actividadesRepository.GetActividadesporDepartamento(id)?.ToList();
+            if (actividadDepartamento != null)
+            {
+                foreach(var actividad in actividadDepartamento)
+                {
+                    _actividadesRepository.Delete(actividad);
+                }
+            }
+            if(departamento!=null)
+            {
+                departamento.IdSuperior = null;
+                _repository.Update(departamento);
+                _repository.Delete(departamento);
+                return Ok("Departamento eliminado");
+            }
+            else
+            {
+                NotFound();
+            }
+        }
     }
 }
